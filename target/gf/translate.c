@@ -175,9 +175,8 @@ static void gf_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
     uint32_t insn = translator_ldl(env, &ctx->base, ctx->base.pc_next);
 
     ctx->cur_insn_len = 4;
- #if 1
-    if (!decode(ctx, insn)) {
-        // HACK:
+    printf("before decode\n");
+    if (!decode(ctx, insn)){;       
         if (insn == 0x73) {
             // ecall
             generate_exception(ctx, RISCV_EXCP_U_ECALL);
@@ -185,14 +184,7 @@ static void gf_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
             gen_exception_illegal(ctx);
         }
     }
- #elif 1
-     // syscall exit(13)
-     tcg_gen_movi_i32(cpu_gpr[xA7], 93);
-     tcg_gen_movi_i32(cpu_gpr[xA0], 13);
-     generate_exception(ctx, RISCV_EXCP_U_ECALL);
- #else
-     gen_exception_illegal(ctx);
- #endif
+    printf("after decode\n");
     ctx->base.pc_next += ctx->cur_insn_len;
 
     /* Only the first insn within a TB is allowed to cross a page boundary. */
@@ -211,6 +203,7 @@ static void gf_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
             }
         }
     }
+   
 }
 
 static void gf_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)

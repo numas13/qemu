@@ -91,6 +91,22 @@ static ObjectClass *gf_cpu_class_by_name(const char *cpu_model)
     }
     return oc;
 }
+static void gf_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+{
+    GFCPU *cpu = GF_CPU(cs);
+    CPUGFState *env = &cpu->env;
+    int i, j;
+    uint8_t *p;
+    for (i = 0; i < 32; i++) {
+        qemu_fprintf(f, " %-8s " TARGET_FMT_lx,
+                    gf_int_regnames[i], env->gpr[i]);
+        if ((i & 3) == 3) {
+            qemu_fprintf(f, "\n");
+        }
+    }
+    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
+}
+
 
 static void gf_cpu_set_pc(CPUState *cs, vaddr value)
 {
@@ -160,7 +176,7 @@ static void gf_cpu_class_init(ObjectClass *c, void *data)
 
     cc->class_by_name = gf_cpu_class_by_name;
     cc->has_work = gf_cpu_has_work;
-    // TODO: cc->dump_state = gf_cpu_dump_state;
+    cc->dump_state = gf_cpu_dump_state;
     cc->set_pc = gf_cpu_set_pc;
     cc->get_pc = gf_cpu_get_pc;
     // TODO: cc->gdb_read_register = riscv_cpu_gdb_read_register;
