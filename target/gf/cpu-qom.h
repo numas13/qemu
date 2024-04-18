@@ -29,8 +29,13 @@
 
 #define TYPE_GF_CPU_ANY              GF_CPU_TYPE_NAME("any")
 #define TYPE_GF_CPU_MAX              GF_CPU_TYPE_NAME("max")
-#define TYPE_GF_CPU_BASE32           GF_CPU_TYPE_NAME("rv32")
-#define TYPE_GF_CPU_BASE64           GF_CPU_TYPE_NAME("rv64")
+#if defined(TARGET_GFRISCV32)
+# define TYPE_GF_CPU_BASE32           GF_CPU_TYPE_NAME("rv32")
+#elif defined(TARGET_GFMIPSEL)
+# define TYPE_GF_CPU_BASE32           GF_CPU_TYPE_NAME("mipsel")
+#else
+# error "unsupported target"
+#endif
 
 OBJECT_DECLARE_CPU_TYPE(GFCPU, GFCPUClass, GF_CPU)
 

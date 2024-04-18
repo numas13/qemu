@@ -38,7 +38,7 @@ int gf_cpu_mmu_index(CPUGFState *env, bool ifetch)
 void cpu_get_tb_cpu_state(CPUGFState *env, vaddr *pc,
                           uint64_t *cs_base, uint32_t *pflags)
 {
-    *pc = env->xl == MXL_RV32 ? env->pc & UINT32_MAX : env->pc;
+    *pc = env->pc & UINT32_MAX;
     *cs_base = 0;
     *pflags = 0;
 }

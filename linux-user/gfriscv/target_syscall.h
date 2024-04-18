@@ -43,11 +43,11 @@ struct target_pt_regs {
     abi_long t6;
 };
 
-#ifdef TARGET_GF32
-#define UNAME_MACHINE "gf32"
+#ifdef TARGET_GFRISCV32
+#define UNAME_MACHINE "gfriscv32"
 #define UNAME_MINIMUM_RELEASE "5.4.0"
 #else
-#define UNAME_MACHINE "gf64"
+#define UNAME_MACHINE "gfriscv64"
 #define UNAME_MINIMUM_RELEASE "4.15.0"
 #endif
 

@@ -66,12 +66,10 @@ static void gf_cpu_reset_hold(Object *obj)
     CPUState *cs = CPU(obj);
     GFCPU *cpu = GF_CPU(cs);
     GFCPUClass *mcc = GF_CPU_GET_CLASS(cpu);
-    CPUGFState *env = &cpu->env;
 
     if (mcc->parent_phases.hold) {
         mcc->parent_phases.hold(obj);
     }
-    env->xl = gf_cpu_mxl(env);
     cs->exception_index = RISCV_EXCP_NONE;
 }
 
@@ -97,11 +95,7 @@ static void gf_cpu_set_pc(CPUState *cs, vaddr value)
     GFCPU *cpu = GF_CPU(cs);
     CPUGFState *env = &cpu->env;
 
-    if (env->xl == MXL_RV32) {
-        env->pc = (int32_t)value;
-    } else {
-        env->pc = value;
-    }
+    env->pc = (int32_t)value;
 }
 
 static vaddr gf_cpu_get_pc(CPUState *cs)
@@ -110,10 +104,7 @@ static vaddr gf_cpu_get_pc(CPUState *cs)
     CPUGFState *env = &cpu->env;
 
     /* Match cpu_get_tb_cpu_state. */
-    if (env->xl == MXL_RV32) {
-        return env->pc & UINT32_MAX;
-    }
-    return env->pc;
+    return env->pc & UINT32_MAX;
 }
 
 static bool gf_cpu_has_work(CPUState *cs)
@@ -127,22 +118,11 @@ static bool gf_cpu_has_work(CPUState *cs)
 
 static void gf_cpu_disas_set_info(CPUState *s, disassemble_info *info)
 {
-    GFCPU *cpu = GF_CPU(s);
-    CPUGFState *env = &cpu->env;
-
-    switch (env->xl) {
-    case MXL_RV32:
-        info->print_insn = print_insn_riscv32;
-        break;
-    case MXL_RV64:
-        info->print_insn = print_insn_riscv64;
-        break;
-    case MXL_RV128:
-        info->print_insn = print_insn_riscv128;
-        break;
-    default:
-        g_assert_not_reached();
-    }
+#if defined(TARGET_GFRISCV32)
+    info->print_insn = print_insn_riscv32;
+#elif defined(TARGET_GFMIPSEL)
+    info->print_insn = print_insn_little_mips;
+#endif
 }
 
 static void gf_cpu_class_init(ObjectClass *c, void *data)
@@ -174,16 +154,12 @@ static void gf_cpu_class_init(ObjectClass *c, void *data)
 
 static void gf_cpu_init(Object *obj)
 {
-    GFCPU *cpu = GF_CPU(obj);
-    CPUGFState *env = &cpu->env;
-
-    env->xl = MXL_RV32;
 }
 
 #define DEFINE_DYNAMIC_CPU(type_name, initfn) \
     {                                         \
         .name = type_name,                    \
-        .parent = TYPE_GF_DYNAMIC_CPU,     \
+        .parent = TYPE_GF_DYNAMIC_CPU,        \
         .instance_init = initfn               \
     }
 
@@ -205,7 +181,7 @@ static const TypeInfo gf_cpu_type_infos[] = {
     },
     DEFINE_DYNAMIC_CPU(TYPE_GF_CPU_ANY,      gf_cpu_init),
     DEFINE_DYNAMIC_CPU(TYPE_GF_CPU_MAX,      gf_cpu_init),
-#if defined(TARGET_GF32)
+#if defined(TARGET_GFRISCV32)
     DEFINE_DYNAMIC_CPU(TYPE_GF_CPU_BASE32,   gf_cpu_init),
 #endif
 };

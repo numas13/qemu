@@ -1943,13 +1943,16 @@ static inline void init_thread(struct target_pt_regs *regs,
 #endif /* TARGET_RISCV */
 
 #ifdef TARGET_GF
-#define ELF_ARCH  EM_RISCV
 
-#ifdef TARGET_GF32
-#define ELF_CLASS ELFCLASS32
+#if defined(TARGET_GFRISCV32)
+# define ELF_ARCH  EM_RISCV
+#elif defined(TARGET_GFMIPSEL)
+# define ELF_ARCH  EM_MIPS
 #else
-#define ELF_CLASS ELFCLASS64
+# error "unsupported target"
 #endif
+
+# define ELF_CLASS ELFCLASS32
 
 static inline void init_thread(struct target_pt_regs *regs,
                                struct image_info *infop)

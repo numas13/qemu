@@ -33,18 +33,11 @@
 static void gf_cpu_synchronize_from_tb(CPUState *cs,
                                           const TranslationBlock *tb)
 {
-    if (!(tb_cflags(tb) & CF_PCREL)) {
-        GFCPU *cpu = GF_CPU(cs);
-        CPUGFState *env = &cpu->env;
+    GFCPU *cpu = GF_CPU(cs);
+    CPUGFState *env = &cpu->env;
 
-        tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
-
-        if (env->xl == MXL_RV32) {
-            env->pc = (int32_t) tb->pc;
-        } else {
-            env->pc = tb->pc;
-        }
-    }
+    tcg_debug_assert(!(cs->tcg_cflags & CF_PCREL));
+    env->pc = (int32_t) tb->pc;
 }
 
 static void gf_restore_state_to_opc(CPUState *cs,
@@ -55,17 +48,8 @@ static void gf_restore_state_to_opc(CPUState *cs,
     CPUGFState *env = &cpu->env;
     target_ulong pc;
 
-    if (tb_cflags(tb) & CF_PCREL) {
-        pc = (env->pc & TARGET_PAGE_MASK) | data[0];
-    } else {
-        pc = data[0];
-    }
-
-    if (env->xl == MXL_RV32) {
-        env->pc = (int32_t)pc;
-    } else {
-        env->pc = pc;
-    }
+    pc = data[0];
+    env->pc = (int32_t)pc;
 }
 
 static const struct TCGCPUOps gf_tcg_ops = {

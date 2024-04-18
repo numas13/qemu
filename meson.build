@@ -2875,7 +2875,7 @@ disassemblers = {
   'or1k' : ['CONFIG_OPENRISC_DIS'],
   'ppc' : ['CONFIG_PPC_DIS'],
   'riscv' : ['CONFIG_RISCV_DIS'],
-  'gf' : ['CONFIG_RISCV_DIS'],
+  'gf' : ['CONFIG_RISCV_DIS', 'CONFIG_MIPS_DIS'],
   'rx' : ['CONFIG_RX_DIS'],
   's390' : ['CONFIG_S390_DIS'],
   'sh4' : ['CONFIG_SH4_DIS'],
